@@ -118,7 +118,7 @@
   <div class="runner-bar">
     <div class="wrap">
       <span class="runner-cmd"><span class="prompt">$</span> mvn test -Dsuite=Valentyn</span>
-      <span class="runner-status" id="runnerStatus">Tests: <span class="runner-count" id="runnerCount">0</span>/5 passed</span>
+      <span class="runner-status" id="runnerStatus">Tests: <span class="runner-count" id="runnerCount">0</span>/<span id="runnerTotal">?</span> passed</span>
     </div>
   </div>
 
@@ -132,11 +132,10 @@
           <h1 class="hero-code"><span class="kw">public class</span> <span class="cls">VALENTYN</span> <span class="kw">implements</span> <span class="cls">SDET</span> <span class="punct">{</span></h1>
         </div>
       </div>
-      <div class="hero-annotation"><span class="at">@DisplayName</span>(<span style="color:var(--string)">"Java / Spring Test Automation Engineer"</span>)</div>
+      <div class="hero-annotation"><span class="at">@DisplayName</span>(<span style="color:var(--string)">"Java / Software Development Engineer in Test"</span>)</div>
       <p class="hero-bio">
-        Six years building test automation frameworks, CI/CD pipelines, and developer tooling from scratch —
-        Selenium and Playwright suites, Jenkins/GitLab pipelines, and my own IDE plugins and libraries under the
-        <strong style="color:#fff">Papaya</strong> name.
+        Seven years building test automation frameworks, CI/CD pipelines, and developer tooling from scratch —
+        Selenium and Playwright suites, Jenkins/GitLab pipelines, and my own libraries, extensions and IDE plugins.
       </p>
       <div class="chip-row">
         <span class="chip">📍 Khmelnytskyi, Ukraine</span>
@@ -207,7 +206,8 @@
         </div>
         <div class="job-highlight">
           Leading the test automation strategy for a complex Electron-based trading platform — designed and built
-          the API &amp; UI automation frameworks <span class="metric">from scratch</span> using Java, Playwright, and Selenium.
+          the API &amp; UI automation frameworks <span class="metric">from scratch</span> using Java, Playwright, and Selenium;
+          mentored junior engineers.
         </div>
       </div>
 
@@ -218,7 +218,7 @@
           <span class="job-dates">Mar 2022 – Mar 2023</span>
         </div>
         <div class="job-highlight">
-          <span class="metric">Reduced the regression cycle by 40%</span> with a custom automation framework; mentored junior engineers.
+          Supported the existing automation framework and implemented CI/CD processes via Jenkins — <span class="metric">reduced the regression cycle by 40%</span>.
         </div>
       </div>
 
@@ -229,7 +229,7 @@
           <span class="job-dates">Aug 2019 – Jan 2022</span>
         </div>
         <div class="job-highlight">
-          Built a test framework from scratch in Java &amp; C#, with mobile testing via Appium and a DevOps pipeline on Jenkins, Docker, and GitLab-CI.
+          Experience across different projects — C#, mobile automation, and primarily Java — while tech leading and building a test framework from scratch.
         </div>
       </div>
 
@@ -339,6 +339,8 @@
       const statusEl = document.getElementById('runnerStatus');
       const buildLine = document.getElementById('buildLine');
       const total = sections.length;
+      const totalEl = document.getElementById('runnerTotal');
+      if (totalEl) totalEl.textContent = total;
       const seen = new Set();
 
       function render() {
