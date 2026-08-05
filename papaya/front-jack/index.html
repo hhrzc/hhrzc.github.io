@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Papaya Front Jack — Chrome Extension for QA Element Inspection</title>
+<link rel="icon" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #141414;
+    --bg-panel: #1e1e1e;
+    --bg-panel-2: #232323;
+    --border: #333;
+    --text: #cfcfcf;
+    --text-dim: #8a8a8a;
+    --papaya: #FF8000;
+    --papaya-light: #FFA640;
+    --papaya-dark: #CC6600;
+    --pass: #6ec07a;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Inter', sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.6; }
+  a { color: var(--papaya-light); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--papaya); outline-offset: 3px; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+  img { max-width: 100%; display: block; }
+
+  /* ── Nav ────────────────────────────────────────────── */
+  .top-nav { padding: 20px 0; border-bottom: 1px solid var(--border); }
+  .top-nav .wrap { display: flex; align-items: center; justify-content: space-between; }
+  .back-link { font-family: var(--mono); font-size: 13px; color: var(--text-dim); }
+  .back-link:hover { color: var(--papaya-light); text-decoration: none; }
+  .top-nav .status { font-family: var(--mono); font-size: 12px; color: var(--text-dim); }
+
+  /* ── Hero ───────────────────────────────────────────── */
+  .hero { padding: 64px 0 48px; }
+  .hero-head { display: flex; align-items: center; gap: 22px; margin-bottom: 22px; }
+  .hero-icon { width: 76px; height: 76px; border-radius: 18px; flex-shrink: 0; }
+  .hero-title { font-family: var(--sans); font-weight: 700; font-size: clamp(28px, 5vw, 42px); color: #fff; margin: 0; }
+  .hero-title .accent { color: var(--papaya); }
+  .hero-tagline { font-family: var(--mono); font-size: 14px; color: var(--pass); margin-top: 4px; }
+
+  .hero-desc { font-size: 16px; max-width: 64ch; color: var(--text); margin: 0 0 28px; }
+
+  .badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
+  .badge { font-family: var(--mono); font-size: 12px; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 5px; padding: 5px 10px; color: var(--text-dim); }
+
+  .cta-row { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+  .btn-primary {
+    font-family: var(--sans); font-weight: 600; font-size: 14px; color: #141414;
+    background: linear-gradient(135deg, var(--papaya-light), var(--papaya));
+    padding: 12px 22px; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px;
+    cursor: not-allowed; opacity: 0.85;
+  }
+  .btn-primary:hover { text-decoration: none; }
+  .cta-note { font-family: var(--mono); font-size: 12px; color: var(--text-dim); }
+  .btn-secondary {
+    font-family: var(--mono); font-size: 13px; color: var(--text); border: 1px solid var(--border);
+    padding: 11px 18px; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-secondary:hover { border-color: var(--papaya); text-decoration: none; }
+
+  /* ── Sections ───────────────────────────────────────── */
+  section { padding: 44px 0; border-top: 1px solid var(--border); }
+  h2.section-title { font-family: var(--sans); font-weight: 700; font-size: 22px; color: #fff; margin: 0 0 8px; }
+  .section-sub { font-family: var(--mono); font-size: 13px; color: var(--text-dim); margin: 0 0 28px; }
+
+  /* ── Features ───────────────────────────────────────── */
+  .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+  .feature-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+  .feature-icon { font-size: 22px; margin-bottom: 10px; display: block; }
+  .feature-name { font-weight: 600; color: #fff; font-size: 15px; margin-bottom: 6px; }
+  .feature-desc { font-size: 14px; color: var(--text-dim); }
+
+  /* ── Screenshot gallery ─────────────────────────────── */
+  .gallery { display: flex; flex-direction: column; gap: 36px; }
+  .shot { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .shot img { width: 100%; height: auto; border-bottom: 1px solid var(--border); }
+  .shot-caption { padding: 14px 18px; font-size: 14px; color: var(--text-dim); }
+  .shot-caption strong { color: var(--text); }
+
+  /* ── Payload block ──────────────────────────────────── */
+  .payload-block { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+  .payload-block pre { margin: 0; font-family: var(--mono); font-size: 13px; color: var(--pass); overflow-x: auto; }
+  .payload-note { font-size: 14px; color: var(--text-dim); margin-top: 14px; }
+
+  /* ── Tech stack ─────────────────────────────────────── */
+  .stack-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .stack-tag { font-family: var(--mono); font-size: 13px; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 5px; padding: 5px 11px; color: var(--text); }
+
+  /* ── Footer ─────────────────────────────────────────── */
+  footer { padding: 48px 0 64px; text-align: center; }
+  .footer-note { font-family: var(--mono); font-size: 13px; color: var(--text-dim); }
+
+  @media (max-width: 560px) {
+    .hero-head { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="top-nav">
+    <div class="wrap">
+      <a class="back-link" href="/">← hhrzc.github.io</a>
+      <span class="status">papaya / front-jack</span>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <section class="hero" style="border-top:none;">
+      <div class="hero-head">
+        <img class="hero-icon" src="icon.png" alt="Papaya Front Jack icon">
+        <div>
+          <h1 class="hero-title">Papaya <span class="accent">Front Jack</span></h1>
+          <div class="hero-tagline">$ chrome-extension --collect elements --optimize ai</div>
+        </div>
+      </div>
+
+      <p class="hero-desc">
+        A Chrome extension that collects element data — a selector plus a screenshot — and packages it as JSON
+        for a companion automation tool. Inspect any element on a page, get a stable CSS or XPath selector,
+        optionally refine it with AI, and send it straight into a test automation pipeline.
+      </p>
+
+      <div class="badge-row">
+        <span class="badge">Manifest V3</span>
+        <span class="badge">Chrome Extension</span>
+        <span class="badge">AI-Assisted Selectors</span>
+        <span class="badge">CSS &amp; XPath</span>
+      </div>
+
+      <div class="cta-row">
+        <span class="btn-primary">⏳ Coming soon to Chrome Web Store</span>
+        <a class="btn-secondary" href="https://hhrzc.github.io/papaya-front-jack-policy/" target="_blank" rel="noopener">📄 Privacy Policy</a>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="section-title">What it does</h2>
+      <p class="section-sub">Built for QA / SDET engineers building a page-object or element library</p>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <span class="feature-icon">🎯</span>
+          <div class="feature-name">Inspect &amp; generate</div>
+          <div class="feature-desc">Click any element on a page — get a stable CSS or XPath selector, skipping dynamic auto-generated classes and IDs.</div>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">🤖</span>
+          <div class="feature-name">AI-optimize</div>
+          <div class="feature-desc">Refine a selector using your own API key — Claude, ChatGPT, DeepSeek, or GitHub Models.</div>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">📸</span>
+          <div class="feature-name">Visual preview</div>
+          <div class="feature-desc">Every match is highlighted on the page and cropped into a screenshot preview before you send it anywhere.</div>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">📤</span>
+          <div class="feature-name">Send to your pipeline</div>
+          <div class="feature-desc">Selector, type, and screenshot POST straight to a local endpoint — build an elements hub in your own automation project.</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="section-title">In action</h2>
+      <p class="section-sub">Real screenshots, real practice site (academybugs.com)</p>
+      <div class="gallery">
+        <div class="shot">
+          <img src="shot-1.png" alt="Papaya Front Jack popup open on a practice QA site, showing the Search, Send to endpoint, Inspect Element, and Optimize with AI buttons">
+          <div class="shot-caption"><strong>Overview</strong> — the full toolset: Search, Send to endpoint, Inspect Element, and AI optimization.</div>
+        </div>
+        <div class="shot">
+          <img src="shot-2.png" alt="A found element highlighted in green on the page, with an arrow connecting it to its cropped preview in the extension popup">
+          <div class="shot-caption"><strong>Search &amp; highlight</strong> — a matched element is outlined on the page and cropped into the preview panel.</div>
+        </div>
+        <div class="shot">
+          <img src="shot-3.png" alt="Close-up of the extension popup showing the Optimize inspected with AI button and a preview of the found element">
+          <div class="shot-caption"><strong>AI optimize</strong> — refine an existing selector for stability using your chosen AI provider.</div>
+        </div>
+        <div class="shot">
+          <img src="shot-4.png" alt="Close-up of the extension popup showing an XPath selector for an add-to-cart button">
+          <div class="shot-caption"><strong>Selector detail</strong> — precise CSS/XPath targeting down to a single button.</div>
+        </div>
+        <div class="shot">
+          <img src="shot-5.png" alt="Confirmation dialog reading Sent to endpoint after clicking the Send to endpoint button">
+          <div class="shot-caption"><strong>Send to endpoint</strong> — the selector, type, and screenshot land in your automation project.</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="section-title">Endpoint payload</h2>
+      <p class="section-sub">What "Send to endpoint" actually POSTs</p>
+      <div class="payload-block">
+        <pre>{
+  "selector": "string — the CSS or XPath selector",
+  "selectorType": "css" | "xpath",
+  "image": "string — base64 PNG of the cropped element"
+}</pre>
+      </div>
+      <p class="payload-note">Sent to whatever URL is configured in Settings — nothing here goes to the extension developer.</p>
+    </section>
+
+    <section>
+      <h2 class="section-title">Built with</h2>
+      <div class="stack-row">
+        <span class="stack-tag">Manifest V3</span>
+        <span class="stack-tag">Vanilla JS</span>
+        <span class="stack-tag">Bootstrap 5</span>
+        <span class="stack-tag">chrome.scripting</span>
+        <span class="stack-tag">chrome.storage</span>
+        <span class="stack-tag">Anthropic API</span>
+        <span class="stack-tag">OpenAI API</span>
+        <span class="stack-tag">DeepSeek API</span>
+        <span class="stack-tag">GitHub Models</span>
+      </div>
+    </section>
+
+  </div>
+
+  <footer>
+    <div class="footer-note">Part of the <a href="/">Papaya</a> ecosystem — built by <a href="/">Valentyn</a></div>
+  </footer>
+
+</body>
+</html>
