@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Papaya Injection — Declarative Selector Hub for Playwright &amp; Selenium</title>
+<link rel="icon" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #141414;
+    --bg-panel: #1e1e1e;
+    --bg-panel-2: #232323;
+    --border: #333;
+    --text: #cfcfcf;
+    --text-dim: #8a8a8a;
+    --papaya: #FF8000;
+    --papaya-light: #FFA640;
+    --papaya-dark: #CC6600;
+    --pass: #6ec07a;
+    --link: #56a8f5;
+    --gold: #ffc66d;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Inter', sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.6; }
+  a { color: var(--papaya-light); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--papaya); outline-offset: 3px; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+  img { max-width: 100%; display: block; }
+  code { font-family: var(--mono); }
+
+  /* ── Nav ────────────────────────────────────────────── */
+  .top-nav { padding: 20px 0; border-bottom: 1px solid var(--border); }
+  .top-nav .wrap { display: flex; align-items: center; justify-content: space-between; }
+  .back-link { font-family: var(--mono); font-size: 13px; color: var(--text-dim); }
+  .back-link:hover { color: var(--papaya-light); text-decoration: none; }
+  .top-nav .status { font-family: var(--mono); font-size: 12px; color: var(--text-dim); }
+
+  /* ── Hero ───────────────────────────────────────────── */
+  .hero { padding: 64px 0 48px; }
+  .hero-head { display: flex; align-items: center; gap: 22px; margin-bottom: 22px; }
+  .hero-icon { width: 76px; height: 76px; border-radius: 18px; flex-shrink: 0; }
+  .hero-title { font-family: var(--sans); font-weight: 700; font-size: clamp(28px, 5vw, 42px); color: #fff; margin: 0; }
+  .hero-title .accent { color: var(--papaya); }
+  .hero-tagline { font-family: var(--mono); font-size: 14px; color: var(--pass); margin-top: 4px; }
+
+  .hero-desc { font-size: 16px; max-width: 66ch; color: var(--text); margin: 0 0 28px; }
+
+  .badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
+  .badge { font-family: var(--mono); font-size: 12px; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 5px; padding: 5px 10px; color: var(--text-dim); }
+
+  .cta-row { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+  .btn-primary {
+    font-family: var(--sans); font-weight: 600; font-size: 14px; color: #141414;
+    background: linear-gradient(135deg, var(--papaya-light), var(--papaya));
+    padding: 12px 22px; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-primary:hover { text-decoration: none; filter: brightness(1.06); }
+  .btn-secondary {
+    font-family: var(--mono); font-size: 13px; color: var(--text); border: 1px solid var(--border);
+    padding: 11px 18px; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-secondary:hover { border-color: var(--papaya); text-decoration: none; }
+
+  /* ── Sections ───────────────────────────────────────── */
+  section { padding: 44px 0; border-top: 1px solid var(--border); }
+  h2.section-title { font-family: var(--sans); font-weight: 700; font-size: 22px; color: #fff; margin: 0 0 8px; }
+  .section-sub { font-family: var(--mono); font-size: 13px; color: var(--text-dim); margin: 0 0 28px; }
+
+  /* ── Feature grid ───────────────────────────────────── */
+  .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+  .feature-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+  .feature-icon { font-size: 22px; margin-bottom: 10px; display: block; }
+  .feature-name { font-weight: 600; color: #fff; font-size: 15px; margin-bottom: 6px; }
+  .feature-desc { font-size: 14px; color: var(--text-dim); }
+
+  /* ── Modules table ──────────────────────────────────── */
+  .modules-table { width: 100%; border-collapse: collapse; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .modules-table th, .modules-table td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 14px; }
+  .modules-table th { font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-dim); background: var(--bg-panel-2); }
+  .modules-table td:first-child { font-family: var(--mono); color: var(--gold); white-space: nowrap; }
+  .modules-table tr:last-child td { border-bottom: none; }
+  .modules-note { font-size: 14px; color: var(--text-dim); margin-top: 14px; }
+
+  /* ── Code / payload blocks ──────────────────────────── */
+  .payload-block { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 10px; padding: 20px; overflow-x: auto; margin-bottom: 18px; }
+  .payload-block pre { margin: 0; font-family: var(--mono); font-size: 13px; color: var(--pass); white-space: pre; }
+  .payload-label { font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-dim); margin: 0 0 8px; }
+  .payload-note { font-size: 14px; color: var(--text-dim); margin-top: 14px; }
+
+  .code-kw { color: #cc7832; }
+  .code-cls { color: var(--gold); }
+  .code-str { color: #6a8759; }
+  .code-ann { color: var(--link); }
+  .code-com { color: var(--text-dim); }
+
+  /* ── Tech stack ─────────────────────────────────────── */
+  .stack-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .stack-tag { font-family: var(--mono); font-size: 13px; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 5px; padding: 5px 11px; color: var(--text); }
+
+  /* ── Footer ─────────────────────────────────────────── */
+  footer { padding: 48px 0 64px; text-align: center; }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  .chip { font-family: var(--mono); font-size: 13px; color: var(--text); background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px; }
+  .chip:hover { border-color: var(--link); }
+  .footer-note { font-family: var(--mono); font-size: 13px; color: var(--text-dim); }
+
+  @media (max-width: 560px) {
+    .hero-head { flex-direction: column; align-items: flex-start; }
+    .modules-table { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="top-nav">
+    <div class="wrap">
+      <a class="back-link" href="/">← hhrzc.github.io</a>
+      <span class="status">papaya / injection</span>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <section class="hero" style="border-top:none;">
+      <div class="hero-head">
+        <img class="hero-icon" src="icon.png" alt="Papaya Injection icon">
+        <div>
+          <h1 class="hero-title">Papaya <span class="accent">Injection</span></h1>
+          <div class="hero-tagline">$ gradlew build --module ppi</div>
+        </div>
+      </div>
+
+      <p class="hero-desc">
+        A hub for your selectors — declarative, interface-based locators for Playwright and Selenium.
+        Describe every selector as a method on an interface (inline or externalized to a properties-style
+        file), and the library builds a dynamic proxy that resolves it to a real <code>Locator</code>
+        (Playwright) or <code>WebElement</code> (Selenium) — lazily, exactly when and where you call it.
+      </p>
+
+      <div class="badge-row">
+        <span class="badge">Playwright</span>
+        <span class="badge">Selenium</span>
+        <span class="badge">Spring Boot</span>
+        <span class="badge">Dynamic Proxy</span>
+        <span class="badge">Lazy Resolution</span>
+        <span class="badge">Java</span>
+      </div>
+
+      <div class="cta-row">
+        <a class="btn-primary" href="https://github.com/hhrzc/papaya-injection" target="_blank" rel="noopener">⌥ View on GitHub</a>
+        <a class="btn-secondary" href="https://github.com/hhrzc/papaya-injection#license" target="_blank" rel="noopener">📄 MIT License</a>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="section-title">Checkpoints</h2>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <span class="feature-icon">💤</span>
+          <div class="feature-name">Lazy by design</div>
+          <div class="feature-desc">Nothing is resolved until you actually call the method — declare your selectors once, use them wherever and whenever your test flow needs them.</div>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">🔌</span>
+          <div class="feature-name">Driver supplied per call</div>
+          <div class="feature-desc">The driver/page is passed in when an element is resolved, not upfront — the same declared element can resolve against different drivers or pages without a page object per driver.</div>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">🧩</span>
+          <div class="feature-name">Interfaces over classes</div>
+          <div class="feature-desc">A deliberate, declarative style in the spirit of JPA/Spring Data — no excessive extending or instantiating, especially convenient alongside Spring dependencies.</div>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">🗂️</span>
+          <div class="feature-name">Two ways to define selectors</div>
+          <div class="feature-desc">Inline on the method via annotations, or externalized into a mapped <code>.telemetry</code> properties file and referenced by key — your choice, per project or per interface.</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="section-title">Modules</h2>
+      <p class="section-sub">Depend on just the module(s) that match your stack</p>
+      <table class="modules-table">
+        <thead>
+          <tr><th>Module</th><th>What it's for</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>ppi-playwright-java</td><td>Playwright <code>Locator</code> support (plain Java).</td></tr>
+          <tr><td>ppi-playwright-spring</td><td>Playwright support with Spring auto-configuration.</td></tr>
+          <tr><td>ppi-selenium-java</td><td>Selenium <code>WebElement</code> support (plain Java).</td></tr>
+          <tr><td>ppi-selenium-spring</td><td>Selenium support with Spring auto-configuration.</td></tr>
+        </tbody>
+      </table>
+      <p class="modules-note">e.g. just <code>ppi-playwright-spring</code> if you're on Playwright + Spring.</p>
+    </section>
+
+    <section>
+      <h2 class="section-title">Installation</h2>
+      <p class="section-sub">Playwright + Spring, via Gradle or Maven</p>
+      <div class="payload-block">
+        <pre>implementation(<span class="code-str">"io.github.hhrzc:ppi-playwright-spring:0.1.0"</span>)</pre>
+      </div>
+      <div class="payload-block">
+        <pre>&lt;dependency&gt;
+    &lt;groupId&gt;io.github.hhrzc&lt;/groupId&gt;
+    &lt;artifactId&gt;ppi-playwright-spring&lt;/artifactId&gt;
+    &lt;version&gt;0.1.0&lt;/version&gt;
+&lt;/dependency&gt;</pre>
+      </div>
+      <p class="payload-note">Playwright/Selenium and Spring are <code>compileOnly</code> — add your own versions of <code>com.microsoft.playwright:playwright</code>, <code>org.seleniumhq.selenium:selenium-java</code>, and/or <code>org.springframework:spring-context</code> alongside this library.</p>
+    </section>
+
+    <section>
+      <h2 class="section-title">Usage</h2>
+      <p class="section-sub">Define once as an interface, resolve lazily wherever you need it</p>
+
+      <p class="payload-label">Inline selector via annotation</p>
+      <div class="payload-block">
+        <pre><span class="code-ann">@Telemetry</span>
+<span class="code-kw">public interface</span> <span class="code-cls">LoginPage</span> <span class="code-kw">extends</span> <span class="code-cls">PpiRepository</span> {
+
+    <span class="code-ann">@Sensor</span>(<span class="code-str">"$//button[name='SignIn']"</span>)
+    LocatorSupplier signInButton();
+
+}</pre>
+      </div>
+
+      <p class="payload-label">Externalized into a .telemetry file, referenced by key</p>
+      <div class="payload-block">
+        <pre><span class="code-ann">@Telemetry</span>(<span class="code-str">"main_pages/login_page.telemetry"</span>)
+<span class="code-kw">public interface</span> <span class="code-cls">LoginPage</span> {
+
+    <span class="code-ann">@Sensor</span>(<span class="code-str">"button.sign-in"</span>)
+    LocatorSupplier signInButton();
+
+}
+
+<span class="code-com">// login_page.telemetry</span>
+button.sign-in=//button[name='SignIn']</pre>
+      </div>
+
+      <p class="payload-label">Parameterized selectors with @Param</p>
+      <div class="payload-block">
+        <pre><span class="code-ann">@Sensor</span>(<span class="code-str">"$//button[@name='{name}']"</span>)
+LocatorSupplier buttonByName(<span class="code-ann">@Param</span>(<span class="code-str">"name"</span>) String name);
+
+<span class="code-com">// usage</span>
+Locator signInButton = loginPage.buttonByName(<span class="code-str">"SignIn"</span>).apply(page);</pre>
+      </div>
+
+      <p class="payload-label">Resolving against the driver/page</p>
+      <div class="payload-block">
+        <pre>LoginPage loginPage = WebElementIgniter.ignite(LoginPage.<span class="code-kw">class</span>);
+Locator signInButton = loginPage.signInButton().apply(page);
+<span class="code-com">// or, for Selenium: WebElement el = loginPage.signInButton().apply(driver);</span></pre>
+      </div>
+
+      <p class="payload-note">A default XPath search is used unless you pass <code>BY.CSS</code> as the first parameter, and a <code>PostfixLocator</code> can be supplied to chain something like <code>.nth(1)</code> onto the resolved locator.</p>
+    </section>
+
+    <section>
+      <h2 class="section-title">Built with</h2>
+      <div class="stack-row">
+        <span class="stack-tag">Java</span>
+        <span class="stack-tag">Dynamic Proxy</span>
+        <span class="stack-tag">Playwright</span>
+        <span class="stack-tag">Selenium</span>
+        <span class="stack-tag">Spring</span>
+        <span class="stack-tag">Gradle</span>
+        <span class="stack-tag">Maven Central</span>
+      </div>
+    </section>
+
+  </div>
+
+  <footer>
+    <div class="chip-row">
+      <a class="chip" href="https://github.com/hhrzc/papaya-injection" target="_blank" rel="noopener">⌥ github.com/hhrzc/papaya-injection</a>
+    </div>
+    <p class="footer-note" style="margin-top:18px;">Part of the <a href="/">Papaya</a> ecosystem — built by <a href="/">Valentyn</a></p>
+  </footer>
+
+</body>
+</html>

@@ -102,6 +102,10 @@
   .proj-card .proj-desc { font-size: 14px; color: var(--text-dim); flex-grow: 1; }
   .proj-card .proj-link { font-family: var(--mono); font-size: 13px; margin-top: 4px; }
 
+  .proj-icon-wrap { width: 42px; height: 42px; border-radius: 10px; background: var(--bg-panel-2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 2px; }
+  .proj-icon-wrap img { width: 26px; height: 26px; object-fit: contain; display: block; }
+  .proj-icon-wrap.fallback { font-family: var(--mono); font-weight: 700; font-size: 15px; color: var(--gold); }
+
   .edu-item { margin-bottom: 12px; }
   .edu-degree { font-size: 15px; color: var(--text); }
   .edu-school { font-family: var(--mono); font-size: 13px; color: var(--gold); }
@@ -152,18 +156,27 @@
       <div class="proj-group-label">Papaya Ecosystem</div>
       <div class="proj-grid">
         <div class="proj-card">
+          <div class="proj-icon-wrap">
+            <img src="icons/papaya-front-jack.png" alt="" onerror="var p=this.parentElement;p.classList.add('fallback');this.remove();p.textContent='PF';">
+          </div>
           <span class="proj-kind">Chrome Extension</span>
           <a class="proj-name" href="/papaya/front-jack/">Papaya Front Jack</a>
           <div class="proj-desc">Inspects page elements, generates stable CSS/XPath selectors, optionally AI-refined, and sends them straight into a test automation pipeline.</div>
           <a class="proj-link" href="/papaya/front-jack/">→ view project</a>
         </div>
         <div class="proj-card">
+          <div class="proj-icon-wrap">
+            <img src="icons/papaya-injection.png" alt="" onerror="var p=this.parentElement;p.classList.add('fallback');this.remove();p.textContent='PI';">
+          </div>
           <span class="proj-kind">Library</span>
-          <a class="proj-name" href="https://github.com/hhrzc/papaya-injection">Papaya Injection</a>
+          <a class="proj-name" href="/papaya/injection">Papaya Injection</a>
           <div class="proj-desc"><!-- TODO: one-line description --> Part of the Papaya automation toolkit.</div>
-          <a class="proj-link" href="https://github.com/hhrzc/papaya-injection">→ view project</a>
+          <a class="proj-link" href="/papaya/injection">→ view project</a>
         </div>
         <div class="proj-card">
+          <div class="proj-icon-wrap">
+            <img src="icons/papaya-paddok.png" alt="" onerror="var p=this.parentElement;p.classList.add('fallback');this.remove();p.textContent='PP';">
+          </div>
           <span class="proj-kind">IDE Plugin</span>
           <a class="proj-name" href="/papaya/paddok/">Papaya Paddok</a>
           <div class="proj-desc"><!-- TODO: one-line description --> Part of the Papaya automation toolkit.</div>
@@ -174,12 +187,18 @@
       <div class="proj-group-label">Tools</div>
       <div class="proj-grid">
         <div class="proj-card">
+          <div class="proj-icon-wrap">
+            <img src="icons/enumutils.png" alt="" onerror="var p=this.parentElement;p.classList.add('fallback');this.remove();p.textContent='EU';">
+          </div>
           <span class="proj-kind">Library</span>
           <a class="proj-name" href="/tools/enumutils/">EnumUtils</a>
           <div class="proj-desc"><!-- TODO: one-line description --> Standalone Java utility library.</div>
           <a class="proj-link" href="/tools/enumutils/">→ view project</a>
         </div>
         <div class="proj-card">
+          <div class="proj-icon-wrap">
+            <img src="icons/out-tool.png" alt="" onerror="var p=this.parentElement;p.classList.add('fallback');this.remove();p.textContent='OT';">
+          </div>
           <span class="proj-kind">Library</span>
           <a class="proj-name" href="/tools/out-tool/">Out Tool</a>
           <div class="proj-desc"><!-- TODO: one-line description --> Standalone Java utility library.</div>
