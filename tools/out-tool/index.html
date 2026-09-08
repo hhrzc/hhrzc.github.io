@@ -156,7 +156,31 @@
 
     <section>
       <h2 class="section-title">Why</h2>
-      <p class="section-sub">Java parameters are pass-by-value — a lambda or method can't reassign a variable in its caller's scope</p>
+      <p class="section-sub">Java has no built-in way to hand a value back out of a method through a parameter — here's the shape that gap usually takes</p>
+
+      <div class="payload-block">
+        <pre><span class="code-com">// The method's real return type stays clean — the domain object your</span>
+<span class="code-com">// test actually cares about. The raw response rides along as an</span>
+<span class="code-com">// optional out parameter, for the cases where you also need it.</span>
+<span class="code-kw">public</span> User createUser(CreateUserRequest request, Out&lt;HttpResponse&gt; rawResponse) {
+    HttpResponse response = apiClient.post(<span class="code-str">"/users"</span>, request);
+    rawResponse.set(response);
+    <span class="code-kw">return</span> responseMapper.toUser(response);
+}</pre>
+      </div>
+      <div class="payload-block">
+        <pre>Out&lt;HttpResponse&gt; rawResponse = <span class="code-kw">new</span> OutObject&lt;&gt;();
+User createdUser = userService.createUser(request, rawResponse);
+
+<span class="code-com">// the parsed domain object drives the rest of the test as usual...</span>
+assertThat(createdUser.getEmail()).isEqualTo(request.getEmail());
+
+<span class="code-com">// ...while the out parameter gives you the transport-level details</span>
+<span class="code-com">// too, without changing what createUser() returns for every other caller</span>
+assertThat(rawResponse.get().statusCode()).isEqualTo(201);</pre>
+      </div>
+      <p class="payload-note">This is the pattern the whole library is named after: an <code>out</code> parameter, C#-style. It's most useful when you don't want (or can't change) the method's primary return type — e.g. it already implements an interface, or the clean domain object is what every other caller expects — but one particular caller also needs something extra that doesn't belong on that return type. The four types below cover different shapes of "something extra."</p>
+
       <div class="feature-grid">
         <div class="feature-card">
           <span class="feature-icon">📦</span>
