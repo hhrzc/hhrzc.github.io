@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Out Tool — C#-Style Out Parameters for Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #141414;
+    --bg-panel: #1e1e1e;
+    --bg-panel-2: #232323;
+    --border: #333;
+    --text: #cfcfcf;
+    --text-dim: #8a8a8a;
+    --accent: #6ec07a;
+    --accent-light: #8fd699;
+    --accent-dark: #4b9756;
+    --pass: #6ec07a;
+    --gold: #ffc66d;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Inter', sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.6; }
+  a { color: var(--accent-light); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+  code { font-family: var(--mono); }
+
+  /* ── Nav ────────────────────────────────────────────── */
+  .top-nav { padding: 20px 0; border-bottom: 1px solid var(--border); }
+  .top-nav .wrap { display: flex; align-items: center; justify-content: space-between; }
+  .back-link { font-family: var(--mono); font-size: 13px; color: var(--text-dim); }
+  .back-link:hover { color: var(--accent-light); text-decoration: none; }
+  .top-nav .status { font-family: var(--mono); font-size: 12px; color: var(--text-dim); }
+
+  /* ── Hero ───────────────────────────────────────────── */
+  .hero { padding: 64px 0 48px; }
+  .hero-head { display: flex; align-items: center; gap: 22px; margin-bottom: 22px; }
+  .hero-title { font-family: var(--sans); font-weight: 700; font-size: clamp(28px, 5vw, 42px); color: #fff; margin: 0; }
+  .hero-title .accent { color: var(--accent); }
+  .hero-tagline { font-family: var(--mono); font-size: 14px; color: var(--pass); margin-top: 4px; }
+
+  .hero-desc { font-size: 16px; max-width: 66ch; color: var(--text); margin: 0 0 28px; }
+
+  .badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
+  .badge { font-family: var(--mono); font-size: 12px; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 5px; padding: 5px 10px; color: var(--text-dim); }
+
+  .cta-row { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+  .btn-primary {
+    font-family: var(--sans); font-weight: 600; font-size: 14px; color: #141414;
+    background: linear-gradient(135deg, var(--accent-light), var(--accent));
+    padding: 12px 22px; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-primary:hover { text-decoration: none; filter: brightness(1.06); }
+  .btn-secondary {
+    font-family: var(--mono); font-size: 13px; color: var(--text); border: 1px solid var(--border);
+    padding: 11px 18px; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-secondary:hover { border-color: var(--accent); text-decoration: none; }
+
+  /* ── Sections ───────────────────────────────────────── */
+  section { padding: 44px 0; border-top: 1px solid var(--border); }
+  h2.section-title { font-family: var(--sans); font-weight: 700; font-size: 22px; color: #fff; margin: 0 0 8px; }
+  .section-sub { font-family: var(--mono); font-size: 13px; color: var(--text-dim); margin: 0 0 28px; }
+
+  /* ── Feature grid ───────────────────────────────────── */
+  .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+  .feature-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+  .feature-icon { font-size: 22px; margin-bottom: 10px; display: block; }
+  .feature-name { font-weight: 600; color: #fff; font-size: 15px; margin-bottom: 6px; }
+  .feature-desc { font-size: 14px; color: var(--text-dim); }
+
+  /* ── API table ──────────────────────────────────────── */
+  .api-table { width: 100%; border-collapse: collapse; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .api-table th, .api-table td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 14px; vertical-align: top; }
+  .api-table th { font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-dim); background: var(--bg-panel-2); }
+  .api-table td:first-child { font-family: var(--mono); color: var(--gold); white-space: nowrap; }
+  .api-table tr:last-child td { border-bottom: none; }
+
+  /* ── Code / payload blocks ──────────────────────────── */
+  .payload-block { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 10px; padding: 20px; overflow-x: auto; margin-bottom: 18px; }
+  .payload-block pre { margin: 0; font-family: var(--mono); font-size: 13px; color: var(--pass); white-space: pre; }
+  .payload-label { font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-dim); margin: 0 0 8px; }
+  .payload-note { font-size: 14px; color: var(--text-dim); margin-top: 14px; }
+
+  .code-kw { color: #cc7832; }
+  .code-cls { color: var(--gold); }
+  .code-str { color: #6a8759; }
+  .code-ann { color: var(--accent); }
+  .code-com { color: var(--text-dim); }
+
+  /* ── Tech stack ─────────────────────────────────────── */
+  .stack-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .stack-tag { font-family: var(--mono); font-size: 13px; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 5px; padding: 5px 11px; color: var(--text); }
+
+  /* ── Footer ─────────────────────────────────────────── */
+  footer { padding: 48px 0 64px; text-align: center; }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  .chip { font-family: var(--mono); font-size: 13px; color: var(--text); background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px; }
+  .chip:hover { border-color: var(--accent); }
+  .footer-note { font-family: var(--mono); font-size: 13px; color: var(--text-dim); }
+
+  @media (max-width: 560px) {
+    .hero-head { flex-direction: column; align-items: flex-start; }
+    .api-table { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="top-nav">
+    <div class="wrap">
+      <a class="back-link" href="/">← hhrzc.github.io</a>
+      <span class="status">tools / out-object</span>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <section class="hero" style="border-top:none;">
+      <div class="hero-head">
+        <img class="hero-icon" src="icon.png" alt="Out Tool icon">
+        <div>
+          <h1 class="hero-title">Out <span class="accent">Tool</span></h1>
+          <div class="hero-tagline">$ implementation("io.github.hhrzc:out-object:0.1.1")</div>
+        </div>
+      </div>
+
+      <p class="hero-desc">
+        A tiny utility for emulating C#-style <code>out</code> parameters in Java. Java has no native
+        way to hand a value back out of a method through a parameter — this library papers over that
+        with small mutable holder objects: a single value (<code>Out</code>), a pair
+        (<code>BiOut</code>), a same-typed pair (<code>EqualsOut</code>), and a growable list
+        (<code>CollectionOut</code>) — each with sensible <code>equals()</code>/<code>hashCode()</code>
+        and a shared notion of "has this actually been set yet?"
+      </p>
+
+      <div class="badge-row">
+        <span class="badge">Java</span>
+        <span class="badge">Zero dependencies</span>
+        <span class="badge">Out parameters</span>
+        <span class="badge">Functional interfaces</span>
+      </div>
+
+      <div class="cta-row">
+        <a class="btn-primary" href="https://mvnrepository.com/artifact/io.github.hhrzc/out-object" target="_blank" rel="noopener">📦 View on Maven Central</a>
+        <a class="btn-secondary" href="https://github.com/hhrzc/tools" target="_blank" rel="noopener">⌥ View on GitHub</a>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="section-title">Why</h2>
+      <p class="section-sub">Java parameters are pass-by-value — a lambda or method can't reassign a variable in its caller's scope</p>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <span class="feature-icon">📦</span>
+          <div class="feature-name">Out&lt;T&gt;</div>
+          <div class="feature-desc">A single mutable slot — <code>get()</code> / <code>set(T)</code>. "Applied" once it holds a non-null value.</div>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">🔗</span>
+          <div class="feature-name">BiOut&lt;T, K&gt;</div>
+          <div class="feature-desc">Two independently-typed slots. Only counts as "applied" once <em>both</em> are set.</div>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">⚖️</span>
+          <div class="feature-name">EqualsOut&lt;T&gt;</div>
+          <div class="feature-desc">A <code>BiOut&lt;T, T&gt;</code> specialization for holding two values of the same type side by side — e.g. expected vs. actual.</div>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">📋</span>
+          <div class="feature-name">CollectionOut&lt;T&gt;</div>
+          <div class="feature-desc">A growable list slot. <code>add(...)</code> requires <code>set(List)</code> first — calling it before that throws a clear exception instead of a silent NPE.</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="section-title">API</h2>
+      <p class="section-sub">Every type shares <code>CommonInterface</code>: <code>reset()</code> and <code>isApplied()</code></p>
+      <table class="api-table">
+        <thead>
+          <tr><th>Type</th><th>Implementation</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Out&lt;T&gt;</td><td>OutObject&lt;T&gt;</td><td>get() / set(T). Applied when non-null.</td></tr>
+          <tr><td>BiOut&lt;T,K&gt;</td><td>BiOutObject&lt;T,K&gt;</td><td>setFirst/setSecond, getFirst/getSecond. Applied when both are non-null.</td></tr>
+          <tr><td>EqualsOut&lt;T&gt;</td><td>EqualsOutObjects&lt;T&gt;</td><td>Same as BiOut, both slots share one type T.</td></tr>
+          <tr><td>CollectionOut&lt;T&gt;</td><td>ArrayListOut&lt;T&gt;</td><td>set(List) then add(T...). add() before set() throws ObjectIsNotInstantiatedException.</td></tr>
+        </tbody>
+      </table>
+      <p class="payload-note">All implementations override <code>equals()</code>/<code>hashCode()</code> (and most, <code>toString()</code>) based on their held value(s), so two holders with the same contents compare equal.</p>
+    </section>
+
+    <section>
+      <h2 class="section-title">Usage</h2>
+
+      <p class="payload-label">Out&lt;T&gt; — a single value</p>
+      <div class="payload-block">
+        <pre>Out&lt;String&gt; name = <span class="code-kw">new</span> OutObject&lt;&gt;();
+name.isApplied(); <span class="code-com">// -&gt; false</span>
+name.set(<span class="code-str">"Alice"</span>);
+name.get();          <span class="code-com">// -&gt; "Alice"</span>
+name.isApplied();   <span class="code-com">// -&gt; true</span>
+name.reset();        <span class="code-com">// back to null / not applied</span></pre>
+      </div>
+
+      <p class="payload-label">BiOut&lt;T, K&gt; — two independently-typed values</p>
+      <div class="payload-block">
+        <pre>BiOut&lt;String, Integer&gt; person = <span class="code-kw">new</span> BiOutObject&lt;&gt;();
+person.setFirst(<span class="code-str">"Alice"</span>);
+person.isApplied();   <span class="code-com">// -&gt; false, second isn't set yet</span>
+person.setSecond(25);
+person.isApplied();   <span class="code-com">// -&gt; true, both are set now</span></pre>
+      </div>
+
+      <p class="payload-label">EqualsOut&lt;T&gt; — two values of the same type</p>
+      <div class="payload-block">
+        <pre>EqualsOut&lt;String&gt; comparison = <span class="code-kw">new</span> EqualsOutObjects&lt;&gt;();
+comparison.setFirst(<span class="code-str">"expected"</span>);
+comparison.setSecond(<span class="code-str">"actual"</span>);
+comparison.getFirst().equals(comparison.getSecond());</pre>
+      </div>
+
+      <p class="payload-label">CollectionOut&lt;T&gt; — a growable list</p>
+      <div class="payload-block">
+        <pre>CollectionOut&lt;Integer&gt; numbers = <span class="code-kw">new</span> ArrayListOut&lt;&gt;();
+numbers.set(<span class="code-kw">new</span> ArrayList&lt;&gt;());
+numbers.add(1, 2, 3);
+numbers.get(); <span class="code-com">// -&gt; [1, 2, 3]</span>
+
+CollectionOut&lt;String&gt; unset = <span class="code-kw">new</span> ArrayListOut&lt;&gt;();
+unset.add(<span class="code-str">"A"</span>); <span class="code-com">// throws ObjectIsNotInstantiatedException — call set() first</span></pre>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="section-title">Installation</h2>
+      <div class="payload-block">
+        <pre>implementation(<span class="code-str">"io.github.hhrzc:out-object:0.1.1"</span>)</pre>
+      </div>
+      <div class="payload-block">
+        <pre>&lt;dependency&gt;
+    &lt;groupId&gt;io.github.hhrzc&lt;/groupId&gt;
+    &lt;artifactId&gt;out-object&lt;/artifactId&gt;
+    &lt;version&gt;0.1.1&lt;/version&gt;
+&lt;/dependency&gt;</pre>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="section-title">Built with</h2>
+      <div class="stack-row">
+        <span class="stack-tag">Java</span>
+        <span class="stack-tag">Generics</span>
+        <span class="stack-tag">Gradle</span>
+        <span class="stack-tag">Maven Central</span>
+      </div>
+    </section>
+
+  </div>
+
+  <footer>
+    <div class="chip-row">
+      <a class="chip" href="https://github.com/hhrzc/tools" target="_blank" rel="noopener">⌥ github.com/hhrzc/tools</a>
+    </div>
+    <p class="footer-note" style="margin-top:18px;">Part of the <a href="/">tools</a> collection — built by <a href="/">Valentyn</a></p>
+  </footer>
+
+</body>
+</html>
