@@ -186,6 +186,36 @@
     </section>
 
     <section>
+      <h2 class="section-title">Introducing</h2>
+      <p class="section-sub">Add selectors to your project in one line:</p>
+      <div class="payload-block">
+        <pre><span class="code-ann">@Telemetry</span>(<span class="code-str">"test_page.telemetry"</span>)
+<span class="code-kw">public interface</span> <span class="code-cls">TestPage</span> <span class="code-kw">extends</span> <span class="code-cls">PpiRepository</span> {
+
+    <span class="code-ann">@Sensor</span> LocatorSupplier byMethodName();
+
+    <span class="code-ann">@Sensor</span>(<span class="code-str">"$by-sensor-value"</span>) LocatorSupplier bySensorValue();
+
+    <span class="code-ann">@Sensor</span>(<span class="code-str">"by-sensor-property"</span>) LocatorSupplier bySensorProperty();
+
+    <span class="code-ann">@Sensor</span>(<span class="code-str">"$button[class*=[{btnName}]"</span>) LocatorSupplier methodParameters(<span class="code-ann">@Param</span>(<span class="code-str">"btnName"</span>) String classAttr);
+
+    <span class="code-ann">@Sensor</span>(<span class="code-str">"$bar"</span>) LocatorSupplier paramAnnotationMissing(String classAttr);
+
+    <span class="code-ann">@Sensor</span>(<span class="code-str">"$button[class*=[{btnName}]"</span>) LocatorSupplier postfixParameterTest(<span class="code-ann">@Param</span>(<span class="code-str">"btnName"</span>) String classAttr, PostfixLocator postfix);
+}</pre>
+      </div>
+
+      <p class="section-sub">Store selector values in a file for fast maintenance:</p>
+      <div class="payload-block">
+        <pre><span class="code-com">// test_page.telemetry</span>
+byMethodName=by-method-name-selector
+by-sensor-property=by-sensor-property-selector
+overrideMethodName=override-method-name-selector</pre>
+      </div>
+    </section>
+
+    <section>
       <h2 class="section-title">Modules</h2>
       <p class="section-sub">Depend on just the module(s) that match your stack</p>
       <table class="modules-table">
